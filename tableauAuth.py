@@ -32,4 +32,3 @@ def tableau_jwt_signin(tableau_base_url, api_version, jwt_token, site_content_ur
     site_id = data["credentials"]["site"]["id"]
     user_id = data["credentials"]["user"]["id"]
     return token, site_id, user_id
-    
