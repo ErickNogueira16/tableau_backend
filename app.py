@@ -4,7 +4,7 @@ import os
 from tableauAuth import generate_jwt
 
 app = Flask(__name__)
-CORS(app, origins=["https://tv-comercial-embed.vercel.app"])
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # 🔑 Lendo variáveis de ambiente
 CONNECTED_APP_CLIENT_ID = os.environ["CONNECTED_APP_CLIENT_ID"]
