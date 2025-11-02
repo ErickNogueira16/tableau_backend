@@ -1,23 +1,20 @@
-import requests
+import jwt
+import uuid
+import datetime
 
-def tableau_pat_signin(tableau_base_url, site_content_url, pat_name, pat_secret):
-    api_version = "3.22"
-    signin_url = f"{tableau_base_url}/api/{api_version}/auth/signin"
+def generate_jwt_token(client_id, key_id, secret_key, user_email, expires_minutes=5):
+    now = datetime.datetime.utcnow()
 
     payload = {
-        "credentials": {
-            "personalAccessTokenName": pat_name,
-            "personalAccessTokenSecret": pat_secret,
-            "site": {"contentUrl": site_content_url}
-        }
+        "iss": client_id,
+        "sub": user_email,
+        "aud": "tableau",
+        "exp": now + datetime.timedelta(minutes=expires_minutes),
+        "jti": str(uuid.uuid4()),
+        "scp": ["tableau:views:embed", "tableau:views:show"]
     }
 
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
-    resp = requests.post(signin_url, json=payload, headers=headers)
-    resp.raise_for_status()
+    headers = {"kid": key_id}
 
-    data = resp.json()
-    token = data["credentials"]["token"]
-    site_id = data["credentials"]["site"]["id"]
-    user_id = data["credentials"]["user"]["id"]
-    return token, site_id, user_id
+    token = jwt.encode(payload, secret_key, algorithm="HS256", headers=headers)
+    return token if isinstance(token, str) else token.decode("utf-8")
